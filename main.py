@@ -1,16 +1,33 @@
-# This is a sample Python script.
+import pygame
+import sys # Import the sys module for exiting the program
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+pygame.init()
 
+# Set window dimensions
+game_width = 800
+game_height = 600
+window_surface = pygame.display.set_mode((game_width, game_height))
+pygame.display.set_caption('Quick Start')
+FramePerSec = pygame.time.Clock()
+# Define colors
+background_color = pygame.Color('#000000') # Black color
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# Create a surface for the background
+background = pygame.Surface((game_width, game_height))
+background.fill(background_color)
 
+is_running = True
+while is_running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            is_running = False
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    # Draw the background
+    window_surface.blit(background, (0, 0))
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # Update the display
+    pygame.display.update()
+
+# Quit pygame and exit the program
+pygame.quit()
+sys.exit()
