@@ -23,7 +23,7 @@ FPS_LIMIT = 60
 # Do we need different load calls to set different themes/songs?
 try:
     pygame.mixer.music.load(os.getcwd() + "\\sounds\\themes\\song18.mp3")
-    pygame.mixer.music.set_volume(0.0) # we set this to 0 for now so ms beans doesnt get annoyed
+    pygame.mixer.music.set_volume(0.05) # we set this to 0 for now so ms beans doesnt get annoyed
     pygame.mixer.music.play(-1)
 except pygame.error:
     print('Music not available or could not be loaded')
@@ -58,6 +58,7 @@ for row in range(num_sprites_y):
         animation_frames.append(image)
 
 # animation_frames now contains a list of individual sprite images
+moving_rect = animation_frames[5].get_rect()
 
 # Create a surface for the background
 background = pygame.Surface((game_width, game_height))
@@ -73,16 +74,35 @@ while is_running:
     window_surface.blit(background, (0, 0))
     pygame.draw.circle(window_surface, "red", player_pos, 40)
 
-    window_surface.blit(animation_frames[2850], player_pos)
 
     fps_value = clock.get_fps()
 
     fps_surface = FONT.render(f"FPS: {fps_value:.2f}", True, colors.WHITE)
     window_surface.blit(fps_surface, (0, 0))
 
-    pygame.display.flip()
+    speed = 15
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        moving_rect.x -= speed
+    if keys[pygame.K_RIGHT]:
+        moving_rect.x += speed
+    if keys[pygame.K_UP]:
+        moving_rect.y -= speed
+    if keys[pygame.K_DOWN]:
+        moving_rect.y += speed
+
+    moving_rect.x = max(0, min(moving_rect.x, game_width - moving_rect.width))
+    moving_rect.y = max(0, min(moving_rect.y, game_height - moving_rect.height))
+
+
+    window_surface.blit(animation_frames[5], moving_rect)
+
+
     # Update the display
-    pygame.display.update()
+    pygame.display.flip()
+
+    # pygame.display.update() # UPDATE will update the entire screen. You can update parts with flip, including the entire screen.
+                              # Like if you wanted to refresh just one icon instead of the entire screen, you'd need flip anyways
     clock.tick(FPS_LIMIT)
 # Quit pygame and exit the program
 pygame.quit()
