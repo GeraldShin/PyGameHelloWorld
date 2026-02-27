@@ -6,13 +6,12 @@ import os
 pygame.init()
 FONT = pygame.font.SysFont("Verdana", 20)
 
-
 # Set window dimensions
 game_width = 800
 game_height = 600
 window_surface = pygame.display.set_mode((game_width, game_height))
 pygame.display.set_caption('SHINLOLS GAME HELLO WORLD')
-player_pos = pygame.Vector2(window_surface.get_width() / 2, window_surface.get_height() / 2)
+center_pos = pygame.Vector2(window_surface.get_width() / 2, window_surface.get_height() / 2)
 # Dead center
 
 clock = pygame.time.Clock()
@@ -30,6 +29,7 @@ except pygame.error:
     running = False
 
 # Importing Sprite Sheet
+axe_sprite = pygame.image.load(os.getcwd() +"\\image_assets\\RavenmoreIconPack.02.2014\\64\\axe.png")
 sprite_sheet = pygame.image.load(os.getcwd() + "\\image_assets\\ProjectUtumno_full.png")
 
 def get_image(sheet, x, y, width, height):
@@ -41,6 +41,7 @@ def get_image(sheet, x, y, width, height):
     # Optional: Set a color key for transparency if your sheet has a solid background color
     # image.set_colorkey((0, 0, 0)) # Assuming black is the background color
     return image
+
 # Example for a sheet with 32x32 pixel sprites arranged in a grid
 sprite_width = 32
 sprite_height = 32
@@ -56,13 +57,16 @@ for row in range(num_sprites_y):
         # Extract the image using the function defined above
         image = get_image(sprite_sheet, x, y, sprite_width, sprite_height)
         animation_frames.append(image)
+        # animation_frames now contains a list of individual sprite images
 
-# animation_frames now contains a list of individual sprite images
-moving_rect = animation_frames[5].get_rect()
-
+moving_rect = axe_sprite.get_rect()
 # Create a surface for the background
 background = pygame.Surface((game_width, game_height))
 background.fill(colors.BLACK)
+
+boss_title_text_surface = FONT.render("BIG BOSS CIRCLE", True, colors.WHITE)
+boss_hp_var = 50000
+
 
 is_running = True
 while is_running:
@@ -72,15 +76,18 @@ while is_running:
 
     # Draw the background
     window_surface.blit(background, (0, 0))
-    pygame.draw.circle(window_surface, "red", player_pos, 40)
-
-
+    circle = pygame.draw.circle(window_surface, "red", center_pos, 40)
+    window_surface.blit(boss_title_text_surface, (circle.x*0.85, circle.y*1.35))
+    boss_health_text_surface = FONT.render(text=str(boss_hp_var), antialias=True, color=colors.WHITE)
+    boss_hp_text_rect = window_surface.blit(boss_health_text_surface, (circle.x*0.85, circle.y*.75))
     fps_value = clock.get_fps()
 
     fps_surface = FONT.render(f"FPS: {fps_value:.2f}", True, colors.WHITE)
-    window_surface.blit(fps_surface, (0, 0))
+    window_surface.blit(fps_surface, fps_surface.get_rect(bottomright = window_surface.get_rect().bottomright))
 
-    speed = 15
+    speed = 10
+    axe_damage = 50
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         moving_rect.x -= speed
@@ -95,9 +102,11 @@ while is_running:
     moving_rect.y = max(0, min(moving_rect.y, game_height - moving_rect.height))
 
 
-    window_surface.blit(animation_frames[5], moving_rect)
+    window_surface.blit(axe_sprite, moving_rect)
 
-
+    if moving_rect.colliderect(circle):
+        boss_hp_var -= axe_damage
+        pygame.display.update(boss_hp_text_rect)
     # Update the display
     pygame.display.flip()
 
